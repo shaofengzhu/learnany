@@ -35,7 +35,22 @@ It's time to create the first html page. Let's create a folder "html", and then 
 
 Now, you could use file explorer to find your hello-world.html file, then click on it. You will see the page is rendered in the browser.
 
+## Allow your page to be accessed from github.
 Let's also commit the change and push it to github.
 
-After it's pushed to github, your page could also be accessed from
+You only need to update your github repo settings to enable your page to be accessed using github pages.
+
+Please click "Settings" -> "Pages", then change the "Source" from "None" to "master".
+
+Now, you could access your page using
+```
+https://shaofengzhu.github.io/learnany/html/hello-world.html
+```
+Please replace the URL with your own github name.
+
+In the future, anything you pushed to the github will be immediately accessed by any user.
+
+## Learn more for HTML from https://www.w3schools.com/html/
+Please learn the basics and HTML Forms. You do not need to learn HTML Graphics, Media.
+
 
