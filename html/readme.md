@@ -53,4 +53,22 @@ In the future, anything you pushed to the github will be immediately accessed by
 ## Learn more for HTML from https://www.w3schools.com/html/
 Please learn the basics and HTML Forms. You do not need to learn HTML Graphics, Media.
 
+## Learn more for JavaScript from https://www.w3schools.com/js/default.asp
+The following is a very basic HTML page using JavaScript
+```html
+<html>
+    <head>
+        <script>
+            function BtnClick() {
+                document.getElementById("DivMessage").innerText = "Hello, World";
+            }
+        </script>
+    </head>
+    <body>
+        <button onclick="BtnClick()">Say Hello</button>
+        <div id="DivMessage"></div>
+    </body>
+</html>
+```
+
 
