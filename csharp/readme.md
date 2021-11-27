@@ -214,6 +214,65 @@ namespace MyNamespace
 }
 ```
 
+# Read/Write file
+As we need to read and write file, let's write a simple program that will read and write file.
+1. Create a folder 'testfileop'
+2. Under the folder, create a testfileop.csproj, whose content is a very simple 
+```xml
+<Project Sdk="Microsoft.Net.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+</Project>
+```
+3. Create Program.cs, which will read and write file.
+```CSharp
+using System;
+using System.IO;
+using System.Text;
+
+namespace MyTestNamespace
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            TestFileRead();
+            TestFileWrite();
+        }
+
+        private static void TestFileWrite()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "activity.txt");
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Hello");
+            sb.AppendLine("World");
+            File.WriteAllText(path, sb.ToString());
+        }
+
+        private static void TestFileRead()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "accounts.txt");
+            string[] lines = File.ReadAllLines(path);
+            foreach (string line in lines)
+            {
+                // use Split to split the line based on separator
+                string[] parts = line.Split(',');
+                foreach (string part in parts)
+                {
+                    Console.Write(part);
+                    Console.Write("|");
+                }
+                Console.WriteLine();
+            }
+        }
+    }
+}
+```
+
+4. Also create a file, 'accounts.txt', which has several lines. Each line uses ',' as separator.
+
 # Login
 As most of the website requires login. We will create a simple website that requires user's login. For example, if the user access http://contoso.com/ and the user has not login yet, the server will redirect the browser to the http://contoso.com/login page, where the user input login name and password. The /login page will read the login name and password, compare it with the information stored in the database. For this excerse, we will use a very simple txt file to store the user's user name and password. Please note that the real world application will have much complicated system to valid user name and password.
 
