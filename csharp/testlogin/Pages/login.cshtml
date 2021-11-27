@@ -1,0 +1,20 @@
+@page
+@model TestLoginNamespace.LoginModel
+<html>
+    <head>
+        <title>Login</title>
+    </head>
+    <body>
+        <form method="post">
+            Name: <input type="text" name="LoginName" />
+            <br />
+            Password: <input type="password" name="LoginPassword" />
+            <br />
+            @Html.AntiForgeryToken()
+            <input type="submit" value="Submit" />
+        </form>
+        @if (Model.InvalidLogin) {
+            <div>Invalid login</div>
+        }
+    </body>
+</html>

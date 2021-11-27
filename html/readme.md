@@ -28,7 +28,9 @@ Now, you have everything setup.
 It's time to create the first html page. Let's create a folder "html", and then add a file "hello-world.html".
 ```html
 <html>
-    <title>First Page</title>
+    <head>
+        <title>First Page</title>
+    </head>
     <body>Hello, World<body>
 </html>
 ```

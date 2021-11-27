@@ -24,6 +24,7 @@ class Program
     public static void Main(String[] args)
     {
         Console.WriteLine("Hello, World");
+        Console.WriteLine(DateTime.Now);
     }
 }
 ```
@@ -136,4 +137,249 @@ The page could be very simple.
 </html>
 ```
 
+
+# Hello world with dynamic data using Model
+We will make a very small change to support dynamic pages.
+
+1. Update the Program.cs by support Razor pages.
+```CSharp
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+class Program
+{
+    public static void Main(string[] args)
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddRazorPages();
+        WebApplication app = builder.Build();
+        app.UseStaticFiles();
+        app.MapRazorPages();
+        app.Run();
+    }
+}
+```
+We only need to add three lines.
+```
+using Microsoft.Extensions.DependencyInjection;
+        builder.Services.AddRazorPages();
+        app.MapRazorPages();
+```
+
+2. Add a folder "Pages". Though you could use other name for the folder, it's better to use the default name "Pages".
+
+3. Add a page hello2.cshtml
+The .cshtml means the C# HTML.
+
+The page could be very simple.
+```
+@page
+@model MyNamespace.HelloWorld2PageModel
+
+<html>
+    <head>
+        <title>Hello, Dynamic</title>
+    </head>
+    <body>
+        @Model.Message
+    </body>
+</html>
+```
+
+4. Add the page model, hello2.cshtml.cs file.
+```CSharp
+using System;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace MyNamespace
+{
+    public class HelloWorld2PageModel: PageModel
+    {
+        public HelloWorld2PageModel()
+        {
+            this.Message = "Default Message";
+        }
+
+        public string Message {
+            get;
+            private set;
+        }
+
+        public void OnGet()
+        {
+            this.Message += "Server Time:" + DateTime.Now;
+        }
+    }
+}
+```
+
+# Login
+As most of the website requires login. We will create a simple website that requires user's login. For example, if the user access http://contoso.com/ and the user has not login yet, the server will redirect the browser to the http://contoso.com/login page, where the user input login name and password. The /login page will read the login name and password, compare it with the information stored in the database. For this excerse, we will use a very simple txt file to store the user's user name and password. Please note that the real world application will have much complicated system to valid user name and password.
+
+1. Create a folder named 'testlogin'
+2. In the new folder, create 'testlogin.csproj' file, whose content is
+```xml
+<Project Sdk="Microsoft.Net.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+</Project>
+```
+3. Create Program.cs, which will launch the website
+```CSharp
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+namespace TestLoginNamespace
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddRazorPages();
+            WebApplication app = builder.Build();
+            app.UseStaticFiles();
+            // add UseDefaultFiles so that when the user navigate to "/", the "/index" will be used.
+            app.UseDefaultFiles();
+            app.MapRazorPages();
+            app.Run();
+        }
+    }
+}
+```
+
+4. Create a folder 'Pages'
+5. Create a index.cshtml and index.cshtml.cs file under the 'Pages'. The index.cshtml will display the curent user's login name. In the index.cshtml.cs, it will check whether there is a cookie. If there is no cookie, then redirect to the login page.
+```cshtml
+@page
+@model TestLoginNamespace.IndexModel
+
+<html>
+    <head>
+        <title>Home Page</title>
+    </head>
+    <body>
+        You are @Model.UserLogin
+    </body>
+</html>
+```
+In the above cshtml page, it reference the model TestLoginNamespace.IndexModel. It also render the @Model.UserLogin on the page.
+
+
+```CSharp
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace TestLoginNamespace
+{
+    public class IndexModel: PageModel
+    {
+        public string UserLogin 
+        {
+            get;
+            set;
+        }
+        public IActionResult OnGet()
+        {
+            this.UserLogin = this.Request.Cookies["UserLogin"];
+            if (String.IsNullOrEmpty(this.UserLogin))
+            {
+                return RedirectToPage("login");
+            }
+            
+            return Page();
+        }
+    }
+}
+```
+The IndexModel get the UserLogin from the Request.Cookies, which was actually set by the login page bellow.
+
+Please also note that OnGet() method returns IActionResult instead of "void". It's because the OnGet() could redirect to another page.
+
+6. Create login.cshtml and login.cshtml.cs. The login page will have a form and input fields.
+```cshtml
+@page
+@model TestLoginNamespace.LoginModel
+<html>
+    <head>
+        <title>Login</title>
+    </head>
+    <body>
+        <form method="post">
+            Name: <input type="text" name="LoginName" />
+            <br />
+            Password: <input type="password" name="LoginPassword" />
+            <br />
+            @Html.AntiForgeryToken()
+            <input type="submit" value="Submit" />
+        </form>
+        @if (Model.InvalidLogin) {
+            <div>Invalid login</div>
+        }
+    </body>
+</html>
+```
+
+The model file will get the LoginName and LoginPassword from Request.Form, do very simple validation. If the user is authenticated, then add a cookie, and redirect to the index page.
+
+In the above page, it also uses @Html.AntiForgeryToken() to render a hidden input field. That's for security reason as ASP.NET requires that token to avoid attack.
+
+```CSharp
+using System;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace TestLoginNamespace
+{
+    public class LoginModel: PageModel
+    {
+        private IWebHostEnvironment m_env;
+        public LoginModel(IWebHostEnvironment env)
+        {
+            m_env = env;
+        }
+
+        public bool InvalidLogin
+        {
+            get;
+            set;
+        }
+
+        public IActionResult OnPost()
+        {
+            string loginName = this.Request.Form["LoginName"];
+            string loginPassword = this.Request.Form["LoginPassword"];
+            string path = Path.Combine(this.m_env.ContentRootPath, "database\\accounts.txt");
+            string[] accountData = System.IO.File.ReadAllLines(path);
+            bool authenticated = false;
+            for (int i = 0; i < accountData.Length; i++)
+            {
+                if (accountData[i].IndexOf(loginName) >= 0)
+                {
+                    authenticated = true;
+                    break;
+                }
+            }
+
+            if (authenticated)
+            {
+                Response.Cookies.Append("UserLogin", loginName);
+                return RedirectToPage("index");
+            }
+            else
+            {
+                InvalidLogin = true;
+                return Page();
+            }
+        }
+    }
+}
+```
 
