@@ -10,6 +10,15 @@ You also do not need to use virtualenv. The virtualenv will make your code more 
 # Hello World
 Create a file app.py.
 ```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return "Hello, World"
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 ```
 
