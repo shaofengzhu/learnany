@@ -11,7 +11,7 @@ function Get-AccessToken {
     try {
         $response = Invoke-WebRequest -Uri $url `
             -Headers @{Metadata="true"} `
-            -ErrorAction Continue
+
         Write-Host $response.Content
         $content =$response.Content | ConvertFrom-Json
         $access_token = $content.access_token
@@ -19,11 +19,7 @@ function Get-AccessToken {
         return $access_token
     }
     catch {
-        $result = $_.Exception.Response.GetResponseStream()
-        $reader = New-Object System.IO.StreamReader($result)
-        $reader.BaseStream.Position = 0
-        $reader.DiscardBufferedData()
-        $responseBody = $reader.ReadToEnd();
+        $responseBody = $_.Exception.Response.Content.ReadAsString()
         Write-Host $responseBody
         return $responseBody
     }
