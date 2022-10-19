@@ -1,5 +1,14 @@
+param (
+    [switch]$AciRegistry
+)
+
+$url = 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fdatabase.windows.net%2F'
+if ($AciRegistry.IsPresent) {
+    $url = 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fcontainerregistry.azure.net%2F'
+}
+
 function Get-AccessToken {
-    $response = Invoke-WebRequest -Uri 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fdatabase.windows.net%2F' `
+    $response = Invoke-WebRequest -Uri $url `
                 -Headers @{Metadata="true"}
     $content =$response.Content | ConvertFrom-Json
     $access_token = $content.access_token
