@@ -19,7 +19,7 @@ function Get-AccessToken {
         return $access_token
     }
     catch {
-        $responseBody = $_.Exception.Response.Content.ReadAsString()
+        $responseBody = $_.Exception.Response.Content.ReadAsStringAsync().Wait()
         Write-Host $responseBody
         return $responseBody
     }
