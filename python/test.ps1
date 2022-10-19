@@ -10,7 +10,9 @@ if ($AciRegistry.IsPresent) {
 function Get-AccessToken {
     try {
         $response = Invoke-WebRequest -Uri $url `
-            -Headers @{Metadata="true"}
+            -Headers @{Metadata="true"} `
+            -ErrorAction Continue
+        Write-Host $response.Content
         $content =$response.Content | ConvertFrom-Json
         $access_token = $content.access_token
         Write-Host "The managed identities for Azure resources access token is $access_token"
